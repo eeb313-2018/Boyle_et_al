@@ -1,4 +1,4 @@
-#Study objectives
+# Study objectives
 - To develop a greater understanding of different biotic and abiotic factors on species traits and trophic levels
 - Does latitude affect body size (length and mass) of predators and prey differently? This is based on Bergmann's rule on body size based on temperature.
 - Does taxonmic diversity increase at lower latitudes around the equator? This is expected from trends in diversity.
