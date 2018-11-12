@@ -1,0 +1,24 @@
+---
+title: "CONDUCT"
+author: "Cole"
+date: "November 9, 2018"
+output: html_document
+---
+
+This document will serve as our 'conduct agreement' which will govern how we we will all behave and treat each other in this group scenario. 
+
+#Code of Conduct
+
+We will create a group dynamic that does not discriminate against anyone, regardless of gender, sexual orientation, disability, physical appearance, body size, race, religion, choice of operating system, choice of text editor, or theme colour of your RStudio.
+
+We will not allow or tolerate harrassment with regards to any of the above. This will allow us to create a set of working conditions taht are most useful for advancement and development of our group project as well as our individual coding and analysis goals. 
+
+#General Guidelines
+
+We have come up with a few rules that we will try to abide by so as to streamline our collaboration process: 
+
+1. Email etiquette - One should endeavour to answer an email within 24hrs at the most, but with 12 hours (excluding weekends and holidays) being the preferred time period 
+2. Addressing concerns - One should always be honest when an issue arises. If there is a difference of opinion or something of the like, it is best to address it straight up in a polite, but not surgarcoated way. 
+3. Chill - While everyone is apt to get stressed at different points, we should all do our best to maintain a reasonable and friendly attitude when interacting and collaborating. 
+
+
