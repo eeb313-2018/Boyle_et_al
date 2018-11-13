@@ -18,7 +18,13 @@ AND MANY MORE (maybe)
 
 # Possible results figures
 
-
+1. A series of maps showing how different trait combinations and predator prey combinations are distributed across a series of abiotic 
+variables/predictors - this will help visualize how traits and food webs are distributed over space 
+2. A series of plots showing how well different traits predict different trophic functional groups (PCA results) 
+3. A series of diagrams (not plots) indicating how different traits are related to different phylogenetic groupings and what
+they tell us about predator-prey relationships 
+4. Histograms of how different traits (i.e. length) are distributed across the region 
+5. Likely there will be more figures depending on how our results turn out 
 
 
 
