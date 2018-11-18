@@ -55,3 +55,6 @@ unique(predprey$Specific_habitat)
 
 #Convert latitude and longitude to decimal values
 
+#write the CSV
+
+write.csv(predprey, file = 'predpreyaltered.csv')
