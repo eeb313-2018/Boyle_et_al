@@ -1,4 +1,5 @@
 library(tidyverse)
+library(measurements)
 
 setwd("/Users/Dunc/Documents/GitHub/Boyle_et_al")
 
@@ -72,14 +73,31 @@ unique(predprey$Specific_habitat)
 
 
 #Convert latitude and longitude to decimal values
-unique(predprey$Latitude)
-
 predprey$Latitude <- gsub("\xbc"," ", predprey$Latitude)
+
+predprey <- predprey %>%
+  mutate(multiplier = ifelse(grepl("S", Latitude), -1, +1))
+
 predprey$Latitude <- gsub("'N","", predprey$Latitude)
 predprey$Latitude <- gsub("'S","", predprey$Latitude)
 
 predprey$Latitude = measurements::conv_unit(predprey$Latitude, from = 'deg_dec_min',to = 'dec_deg')
+predprey$Latitude <- as.numeric(predprey$Latitude)
+predprey$Latitude <- predprey$Latitude * predprey$multiplier
 
+
+predprey$Longitude <- gsub("\xbc"," ", predprey$Longitude)
+
+predprey <- predprey %>%
+  mutate(multiplier_longitude = ifelse(grepl("W", Longitude), -1, +1))
+
+predprey$Longitude <- gsub("'W","", predprey$Longitude)
+predprey$Longitude <- gsub("'E","", predprey$Longitude)
+
+predprey$Longitude = measurements::conv_unit(predprey$Longitude, from = 'deg_dec_min',to = 'dec_deg')
+predprey$Longitude <- as.numeric(predprey$Longitude)
+
+predprey$Longitude <- predprey$Longitude * predprey$multiplier_longitude
 
 
 #write the CSV
