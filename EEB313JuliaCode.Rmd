@@ -1,0 +1,178 @@
+---
+title: "Untitled"
+output:
+  html_document: default
+  word_document: default
+---
+```{r}
+#make theme for all plots
+fte_theme <- function(){
+  color.background = 'ghostwhite'
+  color.grid.major = 'black'
+  color.axis.text = 'black'
+  color.axis.title = 'black'
+  color.title = 'black'
+  theme_bw(base_size = 9) + 
+    theme(panel.background = element_rect(fill=color.background,color = color.background)) +
+    theme(plot.background = element_rect(fill = color.background, color = color.background)) +
+    theme(panel.border = element_rect(colour = 'black')) +
+    theme(panel.grid.major = element_blank()) + 
+    theme(panel.grid.minor = element_blank()) + 
+    theme(axis.ticks = element_blank()) +
+    theme(plot.title = element_text(color = color.title, size = 15, vjust = 1.25)) +
+    theme(axis.text.x = element_text(size = 8, color = color.axis.text, angle = 90)) + 
+    theme(axis.text.y = element_text(size = 10, color = color.axis.text)) + 
+    theme(axis.title.x = element_text(size = 12, color = color.axis.title, vjust = 0)) +
+    theme(axis.title.y = element_text(size = 12, color = color.axis.title, vjust = 1.25)) + 
+    theme(plot.title = element_text(hjust = 0.5)) + 
+    theme(axis.line.x = element_line(color="black", size = 0.15),
+          axis.line.y = element_line(color="black", size = 0.15)) 
+  
+}
+```
+
+
+```{r}
+#loading in data
+predprey<-read.csv('predprey.csv')
+library(tidyverse)
+
+```
+
+#Looking at effect of Latitude on predator and prey mass, using ggplot
+```{r}
+masslat_p<-ggplot(data=predprey, aes(x=Latitude, y=Prey_mass))+
+  geom_point()+
+  geom_smooth(method='lm')+
+  fte_theme()
+masslat_p+ xlab("Latitude")+ ylab("Prey mass (mg)")
+masslat_P<-ggplot(data=predprey, aes(x=Latitude, y=Predator_mass))+
+  geom_point()+
+  geom_smooth(method='lm')+
+  fte_theme()
+masslat_P+ xlab("Latitude")+ ylab("Predator mass (mg)")
+
+#Trendlines show majority of mass stays consistent throughout latitudes, with lots of variation around 40degrees (which was more sampled compared to the other latitudes)
+
+```
+Check to see if linear model for pred mass is significant
+```{r}
+predlong<- lm(predprey$Predator_mass~predprey$Longitude) #significant and negative 
+summary(predlong)
+
+predlat<-lm(predprey$Predator_mass~predprey$Latitude) #significant and positive
+summary(predlat)
+
+```
+```{r}
+preylat<-lm(predprey$Prey_mass~predprey$Latitude) #significant and positive
+summary(preylat)
+
+preylong<-lm(predprey$Prey_mass~predprey$Longitude) #not significant
+summary(preylong)
+```
+
+
+#Looking at how data is distributed between longitude~latitude
+```{r}
+longlat<- lm(predprey$Latitude~predprey$Longitude)
+plot(longlat)
+
+```
+Very unregular, possibly pursue a log transform?
+
+#Looking at taxonomic diversity in general and over space
+    
+```{r}
+ggplot(data = predprey, aes(x = Predator_common_name)) +
+  geom_bar(position = position_dodge(width=2))+
+  fte_theme()
+ggplot(data = predprey, aes(x = Prey_common_name)) +
+  geom_bar(position = position_dodge(width=2))+
+  fte_theme()
+```
+We can see that there are many species who only appear a few times (rare), while others form the majority of all data points.
+
+Now let's plot species richness over latitude:
+```{r}
+predprey %>%
+ group_by(Latitude) %>%
+ summarize(Predator_Species_Richness=length(unique(Predator_common_name))) %>% #find the unique number of species at each latitude
+  ggplot(aes(x= Latitude, y=Predator_Species_Richness))+
+  geom_point()+
+  geom_smooth(method='lm')+
+  fte_theme()
+
+predprey %>%
+ group_by(Latitude) %>%
+ summarize(Prey_Species_Richness=length(unique(Prey_common_name))) %>% 
+  ggplot(aes(x= Latitude, y=Prey_Species_Richness))+
+  geom_point()+
+  geom_smooth(method='lm')+
+  fte_theme()
+
+#Make linear models for these
+predpreyalt<-predprey %>%
+  group_by(Latitude) %>% 
+  mutate(Predator_Species_Richness=length(unique(Predator_common_name)))
+richlat_P<-lm(predpreyalt$Predator_Species_Richness~predpreyalt$Latitude)
+summary(richlat_P)
+
+predpreyalt<-predpreyalt %>%
+  group_by(Latitude) %>% 
+  mutate(Prey_Species_Richness=length(unique(Prey_common_name)))
+richlat_p<-lm(predpreyalt$Prey_Species_Richness~predpreyalt$Latitude)
+summary(richlat_p)
+
+```
+
+
+
+#PCA to see correlations between data
+```{r}
+library(car)
+library(psych)
+library(multcomp)
+
+#select only the traits we think will have biological meaning
+cutpredprey<-predprey %>% 
+  dplyr::select(Predator, Predator_common_name, Predator_total_length, Predator_mass, Prey_common_name, Prey_taxon, Prey_length, Prey_mass, Geographic_location, Latitude, Longitude, Depth, Mean_annual_temp, Specific_habitat)
+
+#change all traits to be numeric, to do PCA
+str(cutpredprey)
+cutpredprey$Predator<- as.numeric(cutpredprey$Predator)
+cutpredprey$Predator_common_name<- as.numeric(cutpredprey$Predator_common_name)
+cutpredprey$Prey_common_name<- as.numeric(cutpredprey$Prey_common_name)
+cutpredprey$Prey_taxon<- as.numeric(cutpredprey$Prey_taxon)
+cutpredprey$Geographic_location<- as.numeric(cutpredprey$Geographic_location)
+cutpredprey$Depth<- as.numeric(cutpredprey$Depth)
+cutpredprey$Specific_habitat<- as.numeric(cutpredprey$Specific_habitat)
+
+cutpredprey<- cutpredprey[complete.cases(cutpredprey),] #Only use complete cases to make things easier
+predprey_cor <- cor(cutpredprey) #create a correlation matrix
+det(predprey_cor) #we want to see that our determinant is greater than the necessary value of 0.00001, and it is
+```
+Running the first principal test:
+```{r}
+pc1 <- principal(predprey_cor, nfactors =14, rotate = "none") #Put 14 factors because this is how many traits we left in
+pc1
+#There are six SS loadings with a value over 1, meaning only 6 factors are probably important
+```
+```{r}
+plot(pc1$values, type = "b") #6 components from the scree plot is also a reasonable estimate
+```
+Let's run the function again with only 6 factors:
+```{r}
+pc2 <- principal(predprey_cor, nfactors = 6, rotate = "none")
+pc2
+```
+Finally, let's run the function using rotate to adjust the values:
+```{r}
+pc3 <- principal(predprey_cor, nfactors = 6, rotate = "varimax")
+pc3
+```
+```{r}
+a<-print.psych(pc3, cut = 0.3, sort = TRUE) #To create a nice read out of our groups
+
+```
+The important groups here could be the clumping of depth, temperature, and predator. Another could be specific habitat and its correlation with predator mass. Finally, prey common name and latitude are also highly correlated. 
