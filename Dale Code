@@ -1,0 +1,344 @@
+```{r}
+getwd()
+#setwd("C:/Users/Dale/Documents")
+read.csv("predpreyaltered.csv")
+```
+
+Assigning dataframe to variable and loading in the tidyverse
+
+```{r}
+predprey<-read.csv("predpreyaltered.csv")
+library(tidyverse)
+```
+
+#Test Plots
+
+1. A simple linear model of Latitude predicting predator and prey length
+2. Comparing differences North and South of the equator 
+3. Comparing sizes at different depths at each lattitude
+4. What fraction of predators at each lattitude are each class of predator? 
+
+
+
+## 1. Latitude predicting Prey and Predator Length
+
+```{r}
+predprey %>% 
+  ggplot(aes(x=Latitude, y = Predator_length))+
+  geom_smooth(method="lm", se=F)+
+  geom_point()+
+  theme_classic()
+
+
+Lat_pred_length<-lm(Predator_length~ Latitude , data = predprey)
+summary(Lat_pred_length)
+```
+Significant result: We see on average that the predator length increases as we go from Southern lattitudes to more northern ones. Not what we'd expect under bergman's rule. Avg change in length of 1.4257cm/degree of latitude. Rquared value very low so NOT predictive. 
+
+
+### Prey: 
+
+```{r}
+predprey %>% 
+  ggplot(aes(x=Latitude, y = Prey_length))+
+  geom_smooth()+
+  geom_point()+
+  theme_classic()
+
+
+Lat_prey_length<-lm(Prey_length~ Latitude , data = predprey)
+summary(Lat_prey_length)
+```
+Prey much smaller than predators but follow same general trend of increasing in size from southern lattitudes to more northern ones. Significant. Not prove Bergman's rule 
+Rsquared value very low so NOT predictive. 
+
+
+
+###Making a Decent Model to Predict Size: 
+
+```{r}
+
+Predict_predator_length<- lm(Predator_length ~ Latitude+Longitude+Predator_taxon+Predator_lifestage+Depth+Prey, data=predprey)
+summary(Predict_predator_length)
+
+
+```
+The model is extremely predictive and relatively simple. This additive model with only a few factors is a good predictor of predator length 
+
+
+#####Question: What happens using the equivalent model for Prey? 
+```{r}
+Predict_prey_length<- lm(Prey_length ~ Latitude+Longitude+Prey_taxon+Depth+Predator, data=predprey)
+summary(Predict_predator_length)
+
+
+```
+Rsquared circa .8 again. Solid model. 
+
+
+
+Correlation Test of Predator Length and Mass: 
+```{r}
+cor(predprey$Predator_length,predprey$Predator_mass)
+```
+VERY Highly correlated therefore both or either are good measures of predator size. 
+
+
+
+
+##Comparing North and South of Equator
+-First making Dataframes from Each Half of Latitudes 
+
+```{r}
+predpreyN<- predprey %>% 
+  filter(Latitude >0)
+predpreyS<- predprey %>% 
+  filter(Latitude <0)
+
+```
+
+Question: how does lattitude predict predator and prey size in each hemisphere? Are the trends different? 
+
+```{r}
+lmNLat<-lm(Predator_length ~ Latitude, data= predpreyN)
+summary(lmNLat)
+
+lmSlat<- lm(Predator_length ~ Latitude, data= predpreyS)
+summary(lmSlat)
+
+summary(predpreyS$Latitude)
+length(unique(predpreyS$Latitude))
+length(unique(predpreyN$Latitude))
+length(nrow(predpreyS))
+View(predpreyS)
+```
+Latitude is much stronger predictor of predator size in the southern hemisphere than in the northern hemisphere. Much more drastic change in the northern hemisphere as well. 
+
+```{r}
+lmNLatPrey<-lm(Prey_length ~ Latitude, data= predpreyN)
+summary(lmNLatPrey)
+
+lmSlatPrey<- lm(Prey_length ~ Latitude, data= predpreyS)
+summary(lmSlatPrey)
+```
+
+Do Predator and Prey Size show different trends than length? 
+
+```{r}
+lmNLatMass<-lm(Predator_mass ~ Latitude, data= predpreyN)
+summary(lmNLatMass)
+
+lmSlatMass<- lm(Predator_mass ~ Latitude, data= predpreyS)
+summary(lmSlatMass)
+```
+
+Southern hemisphere is again pretty good at predicting but northern hemisphere has abysmally low Rsquared. 
+
+
+```{r}
+lmNLatMassPy<-lm(Prey_mass ~ Latitude, data= predpreyN)
+summary(lmNLatMassPy)
+
+lmSlatMassPy<- lm(Prey_mass ~ Latitude, data= predpreyS)
+summary(lmSlatMassPy)
+```
+
+Both terrible predictors of prey Mass! 
+
+
+3. Comparing sizes at different depths at each lattitude
+4. What fraction of predators at each lattitude are each class of predator? 
+
+##Comparing Sizes at Differing Depths and Lattitudes: 
+
+1. For the Whole dataset, how good is depth at predicting size or length? 
+
+```{r}
+PredLengthDepth<- lm(Predator_length ~ Depth, data=predprey)
+summary(PredLengthDepth)
+
+PreyLengthDepth<- lm(Prey_length ~ Depth, data = predprey)
+summary(PreyLengthDepth)
+
+PredMassDepth<- lm(Predator_mass ~ Depth, data= predprey)
+summary(PredMassDepth)
+
+PreyMassDepth<- lm(Prey_mass ~ Depth, data=predprey)
+summary(PreyMassDepth)
+
+```
+Depth is a much better predictor of Predator length than it is of predator mass. 
+
+
+How does this relationship change for Northern and Sourthern Hemisphere? 
+
+Northern
+```{r}
+NPredLengthDepth<- lm(Predator_length ~ Depth, data=predpreyN)
+summary(NPredLengthDepth)
+
+NPreyLengthDepth<- lm(Prey_length ~ Depth, data = predpreyN)
+summary(NPreyLengthDepth)
+
+NPredMassDepth<- lm(Predator_mass ~ Depth, data= predpreyN)
+summary(NPredMassDepth)
+
+NPreyMassDepth<- lm(Prey_mass ~ Depth, data=predpreyN)
+summary(NPreyMassDepth)
+```
+Most R squared still garbage. 
+
+
+```{r}
+PredLengthDepthS<- lm(Predator_length ~ Depth, data=predpreyS)
+summary(PredLengthDepthS)
+
+PreyLengthDepthS<- lm(Prey_length ~ Depth, data = predpreyS)
+summary(PreyLengthDepthS)
+
+PredMassDepthS<- lm(Predator_mass ~ Depth, data= predpreyS)
+summary(PredMassDepthS)
+
+PreyMassDepthS<- lm(Prey_mass ~ Depth, data=predpreyS)
+summary(PreyMassDepthS)
+```
+Depth is a good predictor of predator length in the southern hemisphere, a moderate predictor of prey lenght, a good predictor of prey length, and a terrible predictor of prey mass. 
+
+
+```{r}
+summary(predprey$Depth)
+```
+
+
+
+
+```{r}
+tempmodel1<- lm(Predator_length~Mean_annual_temp, data=predpreyS)
+summary(tempmodel1)
+```
+
+
+
+
+
+```{r}
+tempmodel2<-lm(Prey_length ~ Mean_annual_temp, data=predpreyS) 
+summary(tempmodel2)
+```
+
+
+
+```{r}
+predprey %>% 
+  ggplot(aes(x=Latitude, y=Mean_annual_temp))+
+           geom_point()+
+           geom_smooth(se=T)
+```
+
+
+-X axis is ocean depth levels
+-Symbols = Hemisphere
+Y-axis = predator length 
+
+
+-X axis is Temperature
+-Symbols = hempisphere
+- Y axis = predator length 
+
+
+
+Depth Classes: 
+
+Epipelagic = Depth<200
+Mesopelagic = 200<Depth<1000
+Bathypelagic = 1000<Depth<4000
+Abyssopelagic= 4000<Depth<6000
+
+
+Hemisphere Classes:
+
+Lattitude>0 = Northern_Hemisphere
+Lattitude<0 = Southern_Hemisphere
+
+
+
+```{r}
+predprey %>%
+  group_by(Latitude,Depth) %>% 
+  summarise(mean(Predator_length))
+```
+Transforming Latitude into a hempishere character named "Hemisphere"
+
+```{r}
+predprey1<-predprey %>% 
+  mutate(Hemisphere =ifelse(Latitude>0, 'Northern_Hemisphere', 'Southern_Hemisphere'))
+
+summary(predprey1)
+
+
+
+```
+
+
+Transfroming Depth into Depth classes: 
+Epipelagic = Depth<200
+Mesopelagic = 200<Depth<1000
+Bathypelagic = 1000<Depth<4000
+Abyssopelagic= 4000<Depth<6000
+
+```{r}
+predprey2<-predprey1 %>% 
+  mutate(Ocean_Layer = ifelse(Depth<200, 'Epipelagic',ifelse(200<Depth& Depth<1000, "Mesopelagic",ifelse(1000<Depth &Depth<4000, 'Bathypelagic',ifelse(4000<Depth &Depth<6000,"Abyssopelagic",'NA')))))
+  
+  
+
+  
+  
+  
+  
+  
+  
+```
+
+
+
+
+Lets see fi we can plot this boy
+
+
+
+```{r}
+
+```
+
+
+```{r}
+predprey2 %>% 
+  group_by(Ocean_Layer, Hemisphere) %>% 
+  summarise(Mean=mean(Predator_length,na.rm=T)) %>% 
+   ggplot(aes(x=Ocean_Layer, y=Mean, shape=Hemisphere, color=Hemisphere))+
+           geom_point(size=4, position=position_dodge(width=0.6))+
+  geom_line()+
+  theme_classic()
+  
+ 
+
+
+
+```
+
+
+
+
+```{r}
+predprey2 %>% 
+  group_by(Mean_annual_temp, Hemisphere) %>% 
+  summarise(Mean=mean(Predator_length,na.rm=T)) %>% 
+   ggplot(aes(x=Mean_annual_temp, y=Mean, shape=Hemisphere, color=Hemisphere))+
+           geom_point(size=4, position=position_dodge(width=0.6))+
+  geom_line()
+
+
+#predprey2 %>% 
+  #group_by(Mean_annual_temp, Hemisphere) %>% 
+ # summarise(Mean=mean(Predator_length,na.rm=T)) 
