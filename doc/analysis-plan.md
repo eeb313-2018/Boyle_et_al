@@ -1,8 +1,7 @@
 # Possible analyses
 -Theoretical model of predator and prey sizes at different lattitudes 
 -linear models for predator and prey seperatley, predicting body size based on temperature, lattitude, depth and any combination of these. 
--Linear model to test for changes in diversity of taxa based on lattitude
--Spatially explicit species distribution model 
+-Linear model to test for changes in diversity of taxa based on lattitude 
 - Correlation analysis and possible PCA using related traits to see if lattitude predicts multiple traits/combinations of traits. 
 
 AND MANY MORE (maybe)
