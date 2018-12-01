@@ -5,7 +5,7 @@ setwd("/Users/Dunc/Documents/GitHub/Boyle_et_al")
 
 ## Always use this code to start so that we have the same column names and cleaned data
 predprey <- read_csv("predprey.csv",col_names = TRUE)
-#View(predprey)
+# View(head(predprey))
 
 # Fix the spaces in column headers
 names(predprey) <- gsub(" ", "_", names(predprey)) #gsub replaces all cases
@@ -13,7 +13,6 @@ names(predprey) <- sub("-", "_", names(predprey)) #sub only replaces the first c
 names(predprey) <- sub("__", "_", names(predprey)) #predator taxon started with two spaces
 names(predprey) <- gsub("/", ".", names(predprey)) #fix / in some column names
 names(predprey) <- sub("_._", ".", names(predprey)) #fix / in some column names
-#View(predprey)
 
 
 ######predatorlength 
@@ -60,7 +59,7 @@ predprey <- predprey %>% mutate(multiplierpreymassunit = case_when(
 predprey <- predprey %>% mutate(Prey_mass = Prey_mass*multiplierpreymassunit) 
 
 predprey$Prey_mass_unit <- gsub("g", "mg",predprey$Prey_mass_unit)
-
+predprey$Prey_mass_unit <- gsub("mmg", "mg",predprey$Prey_mass_unit)
 
 ######Other corrections
 unique(predprey$Prey_conversion_to_mass_reference) # sub 'n/a' with blank
@@ -73,7 +72,7 @@ unique(predprey$Specific_habitat)
 
 
 #Convert latitude and longitude to decimal values
-predprey$Latitude <- gsub("\xbc"," ", predprey$Latitude)
+predprey$Latitude <- gsub("\xba"," ", predprey$Latitude)
 
 predprey <- predprey %>%
   mutate(multiplier = ifelse(grepl("S", Latitude), -1, +1))
@@ -86,7 +85,7 @@ predprey$Latitude <- as.numeric(predprey$Latitude)
 predprey$Latitude <- predprey$Latitude * predprey$multiplier
 
 
-predprey$Longitude <- gsub("\xbc"," ", predprey$Longitude)
+predprey$Longitude <- gsub("\xba"," ", predprey$Longitude)
 
 predprey <- predprey %>%
   mutate(multiplier_longitude = ifelse(grepl("W", Longitude), -1, +1))
@@ -98,6 +97,10 @@ predprey$Longitude = measurements::conv_unit(predprey$Longitude, from = 'deg_dec
 predprey$Longitude <- as.numeric(predprey$Longitude)
 
 predprey$Longitude <- predprey$Longitude * predprey$multiplier_longitude
+
+
+#write the CSV
+write.csv(predprey, file = 'predpreyaltered.csv')
 
 
 #write the CSV
