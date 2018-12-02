@@ -540,17 +540,28 @@ plot(preylong)
 ##### What about species richness? Can that be explained for our different groups in our dataset by latitude?
 
 ### plots of latitude and species richness 
-RichnessbyLat <- predprey %>%
+###First let's look at predator species richness
+RichnessbyLatPredator <- predprey %>%
   group_by(Latitude) %>%
-  summarize(Predator_Species_Richness=length(unique(Predator_common_name))) %>% #find the unique number of species at each latitude
+  summarize(Predator_Species_Richness=length(unique(Predator_common_name))) %>% #find the unique number of predator species at each latitude
   ggplot(aes(x= Latitude, y=Predator_Species_Richness))+
   geom_point()+
   geom_smooth(method='lm')+
   fte_theme() +
   labs(x = 'Latitude', y = 'Predator Species Richness')
-RichnessbyLat
+RichnessbyLatPredator
 
-### Look at the results of above plot using some regression 
+###Now, prey species richness
+RichnessbyLatPrey <-predprey %>%
+ group_by(Latitude) %>%
+ summarize(Prey_Species_Richness=length(unique(Prey_common_name))) %>% 
+  ggplot(aes(x= Latitude, y=Prey_Species_Richness))+
+  geom_point()+
+  geom_smooth(method='lm')+
+  fte_theme()
+RichnessbyLatPrey
+
+### Look at the results of above plots using some regression 
 predpreyalt<-predprey %>%
   group_by(Latitude) %>% 
   mutate(Predator_Species_Richness=length(unique(Predator_common_name)))
