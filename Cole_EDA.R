@@ -5,7 +5,7 @@ predprey <- read.csv(file = 'predpreyaltered.csv')
 library(tidyverse);library(RColorBrewer);library(scales); library(grid); library(extrafont)
 
 #inital subbing/other commands
-
+unique(predprey$Predator.lifestage)
 predprey$Predator_lifestage <- gsub("Adult", "adult",predprey$Predator_lifestage)
 
 predprey <- predprey %>% 
@@ -94,7 +94,7 @@ meanpreylength_geoloc <- predprey %>%
 summary(predprey$Predator_length)
 predprey <- predprey %>% 
   mutate(PredSize = ifelse(Predator_length < 300, 'Small', 
-         ifelse(Predator_length > 300 & Predator_length < 1200 , 'Medium', 'Large'))) 
+                           ifelse(Predator_length > 300 & Predator_length < 1200 , 'Medium', 'Large'))) 
 predprey$PredSize <- as.factor(predprey$PredSize)
 
 

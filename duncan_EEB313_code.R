@@ -1,5 +1,4 @@
-# Duncan Script EEB313
-library(tidyverse)
+
 
 predprey <- read_csv("predpreyaltered.csv",col_names=TRUE)
 

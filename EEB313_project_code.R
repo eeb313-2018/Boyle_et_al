@@ -9,10 +9,10 @@ predprey <- read_csv("predprey.csv",col_names = TRUE)
 
 # Fix the spaces in column headers
 names(predprey) <- gsub(" ", "_", names(predprey)) #gsub replaces all cases
-names(predprey) <- sub("-", "_", names(predprey)) #sub only replaces the first case in each character string
-names(predprey) <- sub("__", "_", names(predprey)) #predator taxon started with two spaces
+names(predprey) <- gsub("-", "_", names(predprey)) #sub only replaces the first case in each character string
+names(predprey) <- gsub("__", "_", names(predprey)) #predator taxon started with two spaces
 names(predprey) <- gsub("/", ".", names(predprey)) #fix / in some column names
-names(predprey) <- sub("_._", ".", names(predprey)) #fix / in some column names
+names(predprey) <- gsub("_._", ".", names(predprey)) #fix / in some column names
 
 
 ######predatorlength 
