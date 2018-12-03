@@ -7,6 +7,9 @@ library(measurements)
 library(RColorBrewer)
 library(MASS)
 library(pracma)
+library(maps)
+library(ggrepel)
+library(mapdata)
 
 ### Load Data
 setwd('C:/Users/coleb/Documents/GitHub/Boyle_et_al-master/Boyle_et_al')
@@ -660,5 +663,20 @@ pred_depth_plot_data %>%
   fte_theme()
 pred_depth_plot
 
+### Map of Study Area
+coords <- data.frame(c(unique(predprey$Latitude)), (unique(predprey$Longitude)))
+colnames(coords) <- c('lat', 'long')
 
+
+
+global <- map_data('world')
+map <- ggplot() + geom_polygon(data = global, aes(x = long, y = lat, group = group), 
+                               fill = 'grey80', colour = 'grey40') +
+  coord_fixed(1.3) +
+  geom_point(data = coords, aes(long,lat), color = 'red3', size = 2.5)+
+  fte_theme() +
+  geom_text_repel(xlim = c(-180,180), ylim = c(-180, 180))+
+  labs(x = 'Longitude', y = 'Latitude', title = 'Sampling Sites Across the Globe')+
+  scale_x_continuous(limits = c(-180,180))
+map
 
