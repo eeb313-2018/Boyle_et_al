@@ -652,7 +652,7 @@ pred_depth_plot_data <- predprey %>%
   filter(Predator_lifestage!="larva/juvenile")
 
 ### Make a plot of predator lifestage vs. the lifestage depth to illustrate where they respond
-pred_depth_plot_data %>% 
+pred_depth_plot <- pred_depth_plot_data %>% 
   ggplot() +
   geom_point(aes(y=-Depth,
                  x=Predator,
