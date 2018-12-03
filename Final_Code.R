@@ -180,8 +180,9 @@ MeanPredLenvGeoLoc <- predprey %>%
            fill = 'turquoise3', alpha = 0.5, width = 0.8, base = 10, stat = 'identity') +
   fte_theme() +
   theme(legend.position = 'none') +
-  labs(x = 'Geographic Location', y = 'Mean Predator Length (log10)', title = 'Predator Length by Geographic Location')
+  labs(x = 'Geographic Location', y = 'Mean Predator Length', title = 'Predator Length by Geographic Location')
 MeanPredLenvGeoLoc
+#hmm so potentially a problem here in that all the biggest things seem to be concentrated in Maine
 
 
 ### MeanPredator Mass (untransformed) vs Geographic Location (name of Geographic location tells us something about latitude)
@@ -194,8 +195,9 @@ MeanPredMassvGeoLoc <- predprey %>%
            fill = 'turquoise3', alpha = 0.5, width = 0.8, base = 10, stat = 'identity') +
   fte_theme() +
   theme(legend.position = 'none') +
-  labs(x = 'Geographic Location', y = 'Mean Predator Length (log10)', title = 'Predator Length by Geographic Location')
+  labs(x = 'Geographic Location', y = 'Mean Predator Length', title = 'Predator Length by Geographic Location')
 MeanPredMassvGeoLoc
+#hmm so potentially a problem here in that all the biggest things seem to be concentrated in Maine
 
 ### Number of Observations of Predator Species (Common Name)
 CountperPredSP <- ggplot(data = predprey) +
