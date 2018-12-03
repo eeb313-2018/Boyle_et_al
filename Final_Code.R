@@ -629,7 +629,11 @@ predprey %>%
   group_by(Predator_lifestage) %>% 
   summarise(Mean=mean(Depth))
 
+
 ### Run an anova to test for depth differences between the different age classes
+life_stage_depth.anova <- aov(predprey$Depth ~ predprey$Predator_lifestage)
+summary(life_stage_depth.anova)
+
 # ANOVA assumes normality so we must test the model residuals
 hist(residuals(life_stage_depth.anova))
 # Output of residuals is approximately normal
@@ -643,6 +647,7 @@ bartlett.test(Depth~Predator_lifestage, data=predprey)
 
 ### Anova test showed significance, use a Tukey HSD test to determine which groups differ
 TukeyHSD(life_stage_depth.anova)
+
 
 ### Remove these three age classes because they are unclear/small and the graph will be more illistative with just adult, juvenile, larva
 pred_depth_plot_data <- predprey %>% 
