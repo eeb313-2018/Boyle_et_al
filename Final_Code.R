@@ -630,8 +630,16 @@ predprey %>%
   summarise(Mean=mean(Depth))
 
 ### Run an anova to test for depth differences between the different age classes
-life_stage_depth.anova <- aov(predprey$Depth ~ predprey$Predator_lifestage)
-summary(life_stage_depth.anova)
+# ANOVA assumes normality so we must test the model residuals
+hist(residuals(life_stage_depth.anova))
+# Output of residuals is approximately normal
+
+# ANOVA assumes independent measures, which the study used
+
+# ANOVA assumes equality of variances
+bartlett.test(Depth~Predator_lifestage, data=predprey)
+# Output has a p-value of 2.2e-16 indicating that variances are not equal
+# Therefore, this ANOVA is invalid, however, equality of variances is sometimes overlooked and this ANOVA can give us useful information
 
 ### Anova test showed significance, use a Tukey HSD test to determine which groups differ
 TukeyHSD(life_stage_depth.anova)
