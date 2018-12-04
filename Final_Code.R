@@ -467,7 +467,7 @@ plot(PredMassDepthS)
 PreyMassDepthS<- lm(Prey_mass ~ Depth, data=predpreyS)
 summary(PreyMassDepthS)
 plot(PreyMassDepthS)
-# Depth is a good predictor of predator length in the southern hemisphere, a moderate predictor of prey length, a good predictor of prey length, and a terrible predictor of prey mass. 
+# Depth is a good predictor of predator length in the southern hemisphere, a moderate predictor of prey lenght, a good predictor of prey length, and a terrible predictor of prey mass. 
 
 
 ###### Does Mean Annual Temperature provide any predictive power?
@@ -549,88 +549,94 @@ MeanTempvPredLen
 ### Linear Model of predator and prey mass against longitude
 predlong<- lm(Predator_mass~Longitude, data = predprey) #significant and negative 
 summary(predlong)
-plot(predlong) #not normal data
+plot(predlong)
 
 preylong<-lm(Prey_mass~Longitude, data = predprey) #not significant
 summary(preylong)
-plot(preylong) #not normal data
-
+plot(preylong)
 
 ##### What about species richness? Can that be explained for our different groups in our dataset by latitude?
 
-### plots of latitude and species richness 
-###First let's look at predator species richness
-RichnessbyLatPredator <- predprey %>%
-  group_by(Latitude) %>%
-  summarize(Predator_Species_Richness=length(unique(Predator_common_name))) %>% #find the unique number of predator species at each latitude
-  ggplot(aes(x= Latitude, y=Predator_Species_Richness))+
+### Add a species richness column to the hemisphere-divided dataset
+predprey2 <- predprey2 %>% 
+  mutate(Prey_Species_Richness=length(unique(Prey_common_name)), 
+         Predator_Species_Richness=length(unique(Predator_common_name)))
+
+### plot predator species richness against latitude
+Predatorrichlat <- predprey2 %>% 
+  group_by(Latitude) %>% 
+  filter(Hemisphere == 'Northern_Hemisphere') %>% 
+  summarize(Predator_Species_Richness=length(unique(Predator_common_name))) %>% #find the unique number of species at each latitude
+  ggplot(.,aes(x=Latitude, y=Predator_Species_Richness))+
   geom_point()+
-  geom_smooth(method='lm')+
-  fte_theme() +
+  geom_smooth(method = 'lm')+
+  fte_theme()+
   labs(x = 'Latitude', y = 'Predator Species Richness')
-RichnessbyLatPredator
+Predatorrichlat
 
+### Linear model to confirm findings from above plot
+Predatorrichlm <- lm(Predator_Species_Richness ~ Latitude, data = predprey2)
+summary(Predatorrichlm)
+plot(Predatorrichlm)
+#so we can see that our model confirms what our plot shows, with astounding non-significance with regards to predictive 
+#ability of Latitude on Species Richness. This goes against classical theory predictions of higher species richness
+#at equitorial latitudes - this does meet assumptions of linear model though 
 
-###Now, prey species richness
-RichnessbyLatPrey <-predprey %>%
- group_by(Latitude) %>%
- summarize(Prey_Species_Richness=length(unique(Prey_common_name))) %>% 
-  ggplot(aes(x= Latitude, y=Prey_Species_Richness))+
+### plot prey species richness against latitude
+Preyrichlat <- predprey2 %>% 
+  group_by(Latitude) %>% 
+  filter(Hemisphere == 'Northern_Hemisphere') %>% 
+  summarize(Prey_Species_Richness=length(unique(Prey_common_name))) %>% 
+  ggplot(.,aes(x=Latitude, y=Prey_Species_Richness))+
   geom_point()+
-  geom_smooth(method='lm')+
-  fte_theme()
-RichnessbyLatPrey
+  geom_smooth(method = 'lm')+
+  fte_theme()+
+  labs(x = 'Latitude', y = 'Prey Species Richness')
+Preyrichlat
 
-
-### Look at the results of above plots using some regression 
-predpreyalt<-predprey %>%
-  group_by(Latitude) %>% 
-  mutate(Predator_Species_Richness=length(unique(Predator_common_name)))
-
-richlat_P<-lm(Predator_Species_Richness~Latitude, data = predpreyalt)
-summary(richlat_P)
-plot(richlat_P) #data isn't quite normal but still tells us about the relationship
-
-### lets do the same with prey 
-predpreyalt<-predpreyalt %>%
-  group_by(Latitude) %>% 
-  mutate(Prey_Species_Richness=length(unique(Prey_common_name)))
-
-richlat_p<-lm(Prey_Species_Richness~Latitude, data = predpreyalt)
-summary(richlat_p)
-plot(richlat_p) #doesn't really look normal but test still tells us about data
-
+### Linear model to confirm findings from above plot
+Preyrichlm <- lm(Prey_Species_Richness ~ Latitude, data = predprey2)
+summary(Preyrichlm)
+plot(Preyrichlm)
+#so we can see that our model confirms what our plot shows, with  non-significance with regards to predictive 
+#ability of Latitude on Species Richness. This goes against classical theory predictions of higher species richness
+#at equitorial latitudes - this does meet assumptions of linear model though 
 ### How about running a PCA
 
 #select only the traits we think will have biological meaning
 cutpredprey<-predprey %>% 
-dplyr::select(Predator_total_length, Predator_mass, Prey_length, Prey_mass, Latitude, Longitude, Depth, Mean_annual_temp)
+dplyr::select(Predator, Predator_common_name, Predator_total_length, Predator_mass, Prey_common_name, Prey_taxon, Prey_length, Prey_mass, Geographic_location, Latitude, Longitude, Depth, Mean_annual_temp, Specific_habitat)
 
 #change all traits to be numeric, to do PCA
 str(cutpredprey)
+cutpredprey$Predator<- as.numeric(cutpredprey$Predator)
+cutpredprey$Predator_common_name<- as.numeric(cutpredprey$Predator_common_name)
+cutpredprey$Prey_common_name<- as.numeric(cutpredprey$Prey_common_name)
+cutpredprey$Prey_taxon<- as.numeric(cutpredprey$Prey_taxon)
+cutpredprey$Geographic_location<- as.numeric(cutpredprey$Geographic_location)
 cutpredprey$Depth<- as.numeric(cutpredprey$Depth)
-
+cutpredprey$Specific_habitat<- as.numeric(cutpredprey$Specific_habitat)
 
 cutpredprey<- cutpredprey[complete.cases(cutpredprey),] #Only use complete cases to make things easier
 predprey_cor <- cor(cutpredprey) #create a correlation matrix
 det(predprey_cor) #we want to see that our determinant is greater than the necessary value of 0.00001, and it is
 
 ### Running the first principal test:
-pc1 <- principal(predprey_cor, nfactors =8, rotate = "none") #Put 8 factors because this is how many traits we left in
+pc1 <- principal(predprey_cor, nfactors =14, rotate = "none") #Put 14 factors because this is how many traits we left in
 pc1
-#There are three SS loadings with a value over 1, meaning only 3 factors are probably important
-plot(pc1$values, type = "b") #3 components from the scree plot is also a reasonable estimate
+#There are six SS loadings with a value over 1, meaning only 6 factors are probably important
+plot(pc1$values, type = "b") #6 components from the scree plot is also a reasonable estimate
 
-### Let's run the function again with only 3 factors:
-pc2 <- principal(predprey_cor, nfactors = 3, rotate = "none")
+### Let's run the function again with only 6 factors:
+pc2 <- principal(predprey_cor, nfactors = 6, rotate = "none")
 pc2
 
 ### Finally, let's run the function using rotate to adjust the values:
-pc3 <- principal(predprey_cor, nfactors = 3, rotate = "varimax")
+pc3 <- principal(predprey_cor, nfactors = 6, rotate = "varimax")
 pc3
 
 a<-print.psych(pc3, cut = 0.3, sort = TRUE) #To create a nice read out of our groups
-### Prey length, prey mass, and predator mass are correlated. Mean annual temp, depth, and a negatively correlated longitude form another group. Finally, longitude, latitude, and predator length appear form one group.
+# The important groups here could be the clumping of depth, temperature, and predator. Another could be specific habitat and its correlation with predator mass. Finally, prey common name and latitude are also highly correlated. 
 
 
 ###### Let's see if we can make some conclusions about how depth is structuring the age classes we see in this data
