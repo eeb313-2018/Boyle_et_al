@@ -326,7 +326,6 @@ plot(lm1)
 
 
 
-#################################################### BELOW HERE COMMENT YOUR OWN STUFF WITH REGARDS TO ASSUMPTIONS
 
 ### Linear model to look at if the prey length shows a pattern across latitude
 predprey$Latitude <- as.factor(predprey$Latitude)
