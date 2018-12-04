@@ -250,6 +250,20 @@ MeanLogPredMassvGeoLoc <- predprey %>%
   labs(x = 'Geographic Location', y = 'Mean Predator Length (log10)', title = 'Predator Length by Geographic Location')
 MeanLogPredMassvGeoLoc
 
+### Plot of mean Annual Temperature vs predator length 
+predprey$Mean_annual_temp <- as.factor(predprey$Mean_annual_temp)
+MeanLogPredLengthvTemp <- predprey %>% 
+  group_by(Mean_annual_temp) %>% 
+  summarize(Mean = mean(log10(Predator_length), na.rm = TRUE)) %>% 
+  filter(Mean > 0) %>% 
+  ggplot(aes(x = Mean_annual_temp, y = Mean)) +
+  geom_bar(colour = 'grey68', 
+           fill = 'turquoise3', alpha = 0.5, width = 0.8, base = 10, stat = 'identity') +
+  fte_theme() +
+  theme(legend.position = 'none') +
+  labs(x = 'Mean Annual Temperature', y = 'Mean Predator Length (log10)', title = 'Predator Length by Temperature')
+MeanLogPredLengthvTemp
+
 ### So from we can't really see anything sticking out like we thought we were going to see, if Bergmann's Rule was 
 ### applicable here. So let's try seeing if some models can verify that Bergmann's rule is in fact not really 
 ### relevant in this scenario
