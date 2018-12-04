@@ -467,7 +467,7 @@ plot(PredMassDepthS)
 PreyMassDepthS<- lm(Prey_mass ~ Depth, data=predpreyS)
 summary(PreyMassDepthS)
 plot(PreyMassDepthS)
-# Depth is a good predictor of predator length in the southern hemisphere, a moderate predictor of prey lenght, a good predictor of prey length, and a terrible predictor of prey mass. 
+# Depth is a good predictor of predator length in the southern hemisphere, a moderate predictor of prey length, a good predictor of prey length, and a terrible predictor of prey mass. 
 
 
 ###### Does Mean Annual Temperature provide any predictive power?
@@ -549,11 +549,11 @@ MeanTempvPredLen
 ### Linear Model of predator and prey mass against longitude
 predlong<- lm(Predator_mass~Longitude, data = predprey) #significant and negative 
 summary(predlong)
-plot(predlong)
+plot(predlong) #not normal data
 
 preylong<-lm(Prey_mass~Longitude, data = predprey) #not significant
 summary(preylong)
-plot(preylong)
+plot(preylong) #not normal data
 
 
 ##### What about species richness? Can that be explained for our different groups in our dataset by latitude?
@@ -570,6 +570,7 @@ RichnessbyLatPredator <- predprey %>%
   labs(x = 'Latitude', y = 'Predator Species Richness')
 RichnessbyLatPredator
 
+
 ###Now, prey species richness
 RichnessbyLatPrey <-predprey %>%
  group_by(Latitude) %>%
@@ -580,6 +581,7 @@ RichnessbyLatPrey <-predprey %>%
   fte_theme()
 RichnessbyLatPrey
 
+
 ### Look at the results of above plots using some regression 
 predpreyalt<-predprey %>%
   group_by(Latitude) %>% 
@@ -587,7 +589,7 @@ predpreyalt<-predprey %>%
 
 richlat_P<-lm(Predator_Species_Richness~Latitude, data = predpreyalt)
 summary(richlat_P)
-plot(richlat_P)
+plot(richlat_P) #data isn't quite normal but still tells us about the relationship
 
 ### lets do the same with prey 
 predpreyalt<-predpreyalt %>%
@@ -596,44 +598,39 @@ predpreyalt<-predpreyalt %>%
 
 richlat_p<-lm(Prey_Species_Richness~Latitude, data = predpreyalt)
 summary(richlat_p)
-plot(richlat_p)
+plot(richlat_p) #doesn't really look normal but test still tells us about data
 
 ### How about running a PCA
 
 #select only the traits we think will have biological meaning
 cutpredprey<-predprey %>% 
-dplyr::select(Predator, Predator_common_name, Predator_total_length, Predator_mass, Prey_common_name, Prey_taxon, Prey_length, Prey_mass, Geographic_location, Latitude, Longitude, Depth, Mean_annual_temp, Specific_habitat)
+dplyr::select(Predator_total_length, Predator_mass, Prey_length, Prey_mass, Latitude, Longitude, Depth, Mean_annual_temp)
 
 #change all traits to be numeric, to do PCA
 str(cutpredprey)
-cutpredprey$Predator<- as.numeric(cutpredprey$Predator)
-cutpredprey$Predator_common_name<- as.numeric(cutpredprey$Predator_common_name)
-cutpredprey$Prey_common_name<- as.numeric(cutpredprey$Prey_common_name)
-cutpredprey$Prey_taxon<- as.numeric(cutpredprey$Prey_taxon)
-cutpredprey$Geographic_location<- as.numeric(cutpredprey$Geographic_location)
 cutpredprey$Depth<- as.numeric(cutpredprey$Depth)
-cutpredprey$Specific_habitat<- as.numeric(cutpredprey$Specific_habitat)
+
 
 cutpredprey<- cutpredprey[complete.cases(cutpredprey),] #Only use complete cases to make things easier
 predprey_cor <- cor(cutpredprey) #create a correlation matrix
 det(predprey_cor) #we want to see that our determinant is greater than the necessary value of 0.00001, and it is
 
 ### Running the first principal test:
-pc1 <- principal(predprey_cor, nfactors =14, rotate = "none") #Put 14 factors because this is how many traits we left in
+pc1 <- principal(predprey_cor, nfactors =8, rotate = "none") #Put 8 factors because this is how many traits we left in
 pc1
-#There are six SS loadings with a value over 1, meaning only 6 factors are probably important
-plot(pc1$values, type = "b") #6 components from the scree plot is also a reasonable estimate
+#There are three SS loadings with a value over 1, meaning only 3 factors are probably important
+plot(pc1$values, type = "b") #3 components from the scree plot is also a reasonable estimate
 
-### Let's run the function again with only 6 factors:
-pc2 <- principal(predprey_cor, nfactors = 6, rotate = "none")
+### Let's run the function again with only 3 factors:
+pc2 <- principal(predprey_cor, nfactors = 3, rotate = "none")
 pc2
 
 ### Finally, let's run the function using rotate to adjust the values:
-pc3 <- principal(predprey_cor, nfactors = 6, rotate = "varimax")
+pc3 <- principal(predprey_cor, nfactors = 3, rotate = "varimax")
 pc3
 
 a<-print.psych(pc3, cut = 0.3, sort = TRUE) #To create a nice read out of our groups
-# The important groups here could be the clumping of depth, temperature, and predator. Another could be specific habitat and its correlation with predator mass. Finally, prey common name and latitude are also highly correlated. 
+### Prey length, prey mass, and predator mass are correlated. Mean annual temp, depth, and a negatively correlated longitude form another group. Finally, longitude, latitude, and predator length appear form one group.
 
 
 ###### Let's see if we can make some conclusions about how depth is structuring the age classes we see in this data
