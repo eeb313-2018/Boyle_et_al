@@ -553,9 +553,12 @@ OceanLayer1
 
 ###ANOVA Testing the signifigance of this plot
 Dale.anova <- aov(Predator_length ~ Ocean_Layer+Hemisphere + Ocean_Layer:Hemisphere, data=predprey2)
-Anova(Dale.anova)
+anova(Dale.anova)
 
 hist(resid(Dale.anova))
+
+TukeyHSD(Dale.anova) #To check what's related to each other in detail
+plot(Dale.anova)
 
 ### Plot mean annual temperature vs mean predator length 
 MeanTempvPredLen <- predprey2 %>% 
