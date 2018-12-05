@@ -96,38 +96,76 @@ ggplot(data = predprey, aes(x = Prey_common_name)) +
 ```
 We can see that there are many species who only appear a few times (rare), while others form the majority of all data points.
 
-Now let's plot species richness over latitude:
+Now let's plot species richness over latitude, separating out hemispheres:
 ```{r}
-predprey %>%
- group_by(Latitude) %>%
- summarize(Predator_Species_Richness=length(unique(Predator_common_name))) %>% #find the unique number of species at each latitude
-  ggplot(aes(x= Latitude, y=Predator_Species_Richness))+
-  geom_point()+
-  geom_smooth(method='lm')+
-  fte_theme()
+predprey2<-predprey %>% 
+  mutate(Hemisphere =ifelse(Latitude>0, 'Northern_Hemisphere', 'Southern_Hemisphere')) #this part is dale's code but I need it for the below to work
 
-predprey %>%
- group_by(Latitude) %>%
- summarize(Prey_Species_Richness=length(unique(Prey_common_name))) %>% 
-  ggplot(aes(x= Latitude, y=Prey_Species_Richness))+
-  geom_point()+
-  geom_smooth(method='lm')+
-  fte_theme()
+predprey2 <- predprey2 %>% 
+  mutate(Prey_Species_Richness=length(unique(Prey_common_name)), 
+         Predator_Species_Richness=length(unique(Predator_common_name)))
+predprey2N <- predprey2 %>% 
+  filter(Hemisphere=="Northern_Hemisphere") #Separate out hemispheres to look more specifically. 
+predprey2S <- predprey2 %>%
+  filter(Hemisphere=="Southern_Hemisphere")
 
-#Make linear models for these
-predpreyalt<-predprey %>%
+PredatorrichlatN <- predprey2N %>% 
   group_by(Latitude) %>% 
-  mutate(Predator_Species_Richness=length(unique(Predator_common_name)))
-richlat_P<-lm(predpreyalt$Predator_Species_Richness~predpreyalt$Latitude)
-summary(richlat_P)
-plot(richlat_P)
+  summarize(Predator_Species_Richness=length(unique(Predator_common_name))) %>% #find the unique number of species at each latitude
+  ggplot(.,aes(x=Latitude, y=Predator_Species_Richness))+
+  geom_point()+
+  geom_smooth(method = 'lm')+
+  fte_theme()+
+  labs(x = 'Latitude', y = 'Predator Species Richness')
+PredatorrichlatN
 
-predpreyalt<-predpreyalt %>%
+PredatorrichlmN <- lm(Predator_Species_Richness ~ Latitude, data = predprey2N)
+summary(PredatorrichlmN) #significant but wrong direction
+plot(PredatorrichlmN)
+
+
+PreyrichlatN <- predprey2N %>% 
   group_by(Latitude) %>% 
-  mutate(Prey_Species_Richness=length(unique(Prey_common_name)))
-richlat_p<-lm(predpreyalt$Prey_Species_Richness~predpreyalt$Latitude)
-summary(richlat_p)
-plot(richlat_p)
+  summarize(Prey_Species_Richness=length(unique(Prey_common_name))) %>% 
+  ggplot(.,aes(x=Latitude, y=Prey_Species_Richness))+
+  geom_point()+
+  geom_smooth(method = 'lm')+
+  fte_theme()+
+  labs(x = 'Latitude', y = 'Prey Species Richness')
+PreyrichlatN
+
+PreyrichlmN <- lm(Prey_Species_Richness ~ Latitude, data = predprey2N)
+summary(PreyrichlmN) #significant but wrong direction
+plot(PreyrichlmN)
+
+
+PredatorrichlatS <- predprey2S %>% 
+  group_by(Latitude) %>% 
+  summarize(Predator_Species_Richness=length(unique(Predator_common_name))) %>% #find the unique number of species at each latitude
+  ggplot(.,aes(x=Latitude, y=Predator_Species_Richness))+
+  geom_point()+
+  geom_smooth(method = 'lm')+
+  fte_theme()+
+  labs(x = 'Latitude', y = 'Predator Species Richness')
+PredatorrichlatS
+
+PredatorrichlmS <- lm(Predator_Species_Richness ~ Latitude, data = predprey2S)
+summary(PredatorrichlmS) #not sig
+plot(PredatorrichlmS)
+
+PreyrichlatS <- predprey2S %>% 
+  group_by(Latitude) %>% 
+  summarize(Prey_Species_Richness=length(unique(Prey_common_name))) %>% 
+  ggplot(.,aes(x=Latitude, y=Prey_Species_Richness))+
+  geom_point()+
+  geom_smooth(method = 'lm')+
+  fte_theme()+
+  labs(x = 'Latitude', y = 'Prey Species Richness')
+PreyrichlatS
+
+PreyrichlmS <- lm(Prey_Species_Richness ~ Latitude, data = predprey2S)
+summary(PreyrichlmS) #not sig
+plot(PreyrichlmS)
 
 ```
 
