@@ -601,47 +601,76 @@ plot(preylong)
 predprey2 <- predprey2 %>% 
   mutate(Prey_Species_Richness=length(unique(Prey_common_name)), 
          Predator_Species_Richness=length(unique(Predator_common_name)))
-### Only use Northern Hemisphere because the southern hemisphere has only three latitudes represented and a trendline would not be appropriate.
+predprey2N <- predprey2 %>% 
+  filter(Hemisphere=="Northern_Hemisphere")
+
+predprey2S <- predprey2 %>%
+  filter(Hemisphere=="Southern_Hemisphere")
+### Make different datasets for northern and southern to make models on
+
+### Overall Linear model 
+Speciesrichlm <- lm(Predator_Species_Richness ~ Latitude*Hemisphere, data = predprey2)
+summary(Speciesrichlm)
+plot(Speciesrichlm)
+### This model found that latitude was a significant predictor, southern hemisphere showed a significant different trend from northern, and the interaction of southern hemisphere and latitude was also significant.
 
 ### plot predator species richness against latitude
-Predatorrichlat <- predprey2 %>% 
+PredatorrichlatN <- predprey2N %>% 
   group_by(Latitude) %>% 
-  filter(Hemisphere == 'Northern_Hemisphere') %>% 
   summarize(Predator_Species_Richness=length(unique(Predator_common_name))) %>% #find the unique number of species at each latitude
   ggplot(.,aes(x=Latitude, y=Predator_Species_Richness))+
   geom_point()+
   geom_smooth(method = 'lm')+
   fte_theme()+
   labs(x = 'Latitude', y = 'Predator Species Richness')
-Predatorrichlat
+PredatorrichlatN
 
-### Linear model to confirm findings from above plot
-Predatorrichlm <- lm(Predator_Species_Richness ~ Latitude, data = predprey2)
-summary(Predatorrichlm)
-plot(Predatorrichlm)
-#so we can see that our model confirms what our plot shows, with astounding non-significance with regards to predictive 
-#ability of Latitude on Species Richness. This goes against classical theory predictions of higher species richness
-#at equitorial latitudes - this does meet assumptions of linear model though 
+PredatorrichlmN <- lm(Predator_Species_Richness ~ Latitude, data = predprey2N)
+summary(PredatorrichlmN) #significant
+plot(PredatorrichlmN) #looks pretty normal!
 
-### plot prey species richness against latitude
-Preyrichlat <- predprey2 %>% 
+PreyrichlatN <- predprey2N %>% 
   group_by(Latitude) %>% 
-  filter(Hemisphere == 'Northern_Hemisphere') %>% 
   summarize(Prey_Species_Richness=length(unique(Prey_common_name))) %>% 
   ggplot(.,aes(x=Latitude, y=Prey_Species_Richness))+
   geom_point()+
   geom_smooth(method = 'lm')+
   fte_theme()+
   labs(x = 'Latitude', y = 'Prey Species Richness')
-Preyrichlat
+PreyrichlatN
 
-### Linear model to confirm findings from above plot
-Preyrichlm <- lm(Prey_Species_Richness ~ Latitude, data = predprey2)
-summary(Preyrichlm)
-plot(Preyrichlm)
-#so we can see that our model confirms what our plot shows, with  non-significance with regards to predictive 
-#ability of Latitude on Species Richness. This goes against classical theory predictions of higher species richness
-#at equitorial latitudes - this does meet assumptions of linear model though 
+PreyrichlmN <- lm(Prey_Species_Richness ~ Latitude, data = predprey2N)
+summary(PreyrichlmN) #significant
+plot(PreyrichlmN)
+
+PredatorrichlatS <- predprey2S %>% 
+  group_by(Latitude) %>% 
+  summarize(Predator_Species_Richness=length(unique(Predator_common_name))) %>% #find the unique number of species at each latitude
+  ggplot(.,aes(x=Latitude, y=Predator_Species_Richness))+
+  geom_point()+
+  geom_smooth(method = 'lm')+
+  fte_theme()+
+  labs(x = 'Latitude', y = 'Predator Species Richness')
+PredatorrichlatS
+
+PredatorrichlmS <- lm(Predator_Species_Richness ~ Latitude, data = predprey2S)
+summary(PredatorrichlmS) #non-significant
+plot(PredatorrichlmS)
+
+PreyrichlatS <- predprey2S %>% 
+  group_by(Latitude) %>% 
+  summarize(Prey_Species_Richness=length(unique(Prey_common_name))) %>% 
+  ggplot(.,aes(x=Latitude, y=Prey_Species_Richness))+
+  geom_point()+
+  geom_smooth(method = 'lm')+
+  fte_theme()+
+  labs(x = 'Latitude', y = 'Prey Species Richness')
+PreyrichlatS
+
+PreyrichlmS <- lm(Prey_Species_Richness ~ Latitude, data = predprey2S)
+summary(PreyrichlmS) #not significant
+plot(PreyrichlmS)
+
 ### How about running a PCA
 
 #select only the traits we think will have biological meaning
