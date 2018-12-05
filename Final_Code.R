@@ -601,6 +601,7 @@ plot(preylong)
 predprey2 <- predprey2 %>% 
   mutate(Prey_Species_Richness=length(unique(Prey_common_name)), 
          Predator_Species_Richness=length(unique(Predator_common_name)))
+### Only use Northern Hemisphere because the southern hemisphere has only three latitudes represented and a trendline would not be appropriate.
 
 ### plot predator species richness against latitude
 Predatorrichlat <- predprey2 %>% 
