@@ -370,10 +370,7 @@ plot(Predict_prey_length)
 # Rsquared circa .8 again. Solid model. 
 
 
-############################################ THIS COR TEST DOESN"T SEEM TO PRINT A RESULT?
-### Correlation Test of Predator Length and Mass: 
-cor(predprey$Predator_length,predprey$Predator_mass)
-# VERY Highly correlated therefore both or either are good measures of predator size. 
+
 
 ##Comparing North and South of Equator
 predprey$Latitude <- latnum
@@ -431,7 +428,7 @@ plot(lmNLatMassPy)
 # Both terrible predictors of prey Mass! 
 
 # Okay so at this point, althought our models are flawed, we can safely assume from our plots etc. that 
-# Latitude isn't structuring size in this system - so what is?
+# Latitude isn't on its own, necessarily structuring size in this system - so what is?
 
 ###### Comparing Sizes at Differing Depths and Lattitudes: 
 
@@ -548,9 +545,17 @@ OceanLayer1 <- predprey2 %>%
   ggplot(aes(x=Ocean_Layer, y=Mean, shape=Hemisphere, color=Hemisphere))+
   geom_point(size=4, position=position_dodge(width=0.6))+
   geom_line()+
+  scale_x_discrete(limits = c("Epipelagic", "Mesopelagic", "Bathypelagic", "Abyssopelagic"))+
   fte_theme() +
   labs(x = 'Ocean Layer (Depth Class)', y = 'Mean Predator Length')
 OceanLayer1
+
+
+###ANOVA Testing the signifigance of this plot
+Dale.anova <- aov(Predator_length ~ Ocean_Layer+Hemisphere + Ocean_Layer:Hemisphere, data=predprey2)
+Anova(Dale.anova)
+
+hist(resid(Dale.anova))
 
 ### Plot mean annual temperature vs mean predator length 
 MeanTempvPredLen <- predprey2 %>% 
@@ -563,6 +568,17 @@ MeanTempvPredLen <- predprey2 %>%
   labs(x = 'Mean Annual Temperature', y = 'Mean Predator Length')
 MeanTempvPredLen
 
+###ANOVA Testing the signifigance of this plot as well 
+Dale.anova1 <- aov(Predator_length ~ Mean_annual_temp +Hemisphere + Mean_annual_temp:Hemisphere, data=predprey2)
+summary(Dale.anova1)
+
+hist(resid(Dale.anova1))
+
+      
+plot(Dale.anova1)
+
+
+###Significant results for both the above models/plots but no homoskedacity of variance. Chosing to ignore this assumption
 
 ###### Let's look at longitude and see if that tells us anything?
 
