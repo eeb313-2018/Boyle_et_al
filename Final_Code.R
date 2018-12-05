@@ -299,6 +299,28 @@ BinnedLength <- predprey %>%
   geom_histogram(stat = 'count')
 # clearly binning doesn't help 
 
+### let's try removing some of our over sampled areas that are also the biggest, and then running 
+### a linear model and a plot to see if we can pull anything out
+predprey$Latitude <- as.factor(predprey$Latitude)
+
+toremove <- c('49', '50.83333333', '51.86666667', '40.16666667', '40.91666667','41.13333333',
+  '42.18333333', '42.66666667', '43.31666667', '43.33333333', '44', '45')
+removed40s <- predprey %>% 
+  filter(., !(Latitude %in% toremove))
+Removedmod <- lm(Predator_mass ~ Latitude+Mean_annual_temp+Longitude+Depth+Geographic_location, data = removed40s)
+summary(Removedmod)
+plot(Removedmod)
+#nothing really jumps out and assumptions are violated 
+
+RemovedTempplot <- removed40s %>% 
+  group_by(Mean_annual_temp) %>% 
+  summarize(Mean = mean(log10(Predator_mass))) %>% 
+  ggplot() +
+  geom_bar(aes(x = Mean_annual_temp, y = Mean), colour = 'grey68', fill = 'turquoise3', stat = 'identity')+
+  fte_theme() +
+  labs(x = 'Mean Annual Temperature', y = 'Mean Predator Mass (log10)')
+RemovedTempplot 
+
 ### Attempt to run a new model with just the northern hemisphere and the mean of the predator lengths and masses since
 ### northern one has way more observations
 predprey$Latitude <- as.numeric(predprey$Latitude)
