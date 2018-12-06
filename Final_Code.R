@@ -33,7 +33,7 @@ fte_theme <- function(){
     theme(axis.text.x = element_text(size = 8, color = color.axis.text, angle = 90)) + 
     theme(axis.text.y = element_text(size = 10, color = color.axis.text)) + 
     theme(axis.title.x = element_text(size = 12, color = color.axis.title, vjust = 0)) +
-    theme(axis.title.y = element_text(size = 12, color = color.axis.title, vjust = 1.25)) + 
+    theme(axis.title.y = element_text(size = 12, color = color.axis.title, vjust = 1.25)) +
     theme(plot.title = element_text(hjust = 0.5)) +
     theme(axis.line.x = element_line(color="black", size = 0.15),
           axis.line.y = element_line(color="black", size = 0.15)) 
