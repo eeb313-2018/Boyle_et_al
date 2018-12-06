@@ -27,7 +27,7 @@ fte_theme <- function(){
     theme(plot.background = element_rect(fill = color.background, color = color.background)) +
     theme(panel.border = element_rect(colour = 'black')) +
     theme(panel.grid.major = element_blank()) + 
-    theme(panel.grid.minor = element_blank()) + 
+    theme(panel.grid.minor = element_blank()) +
     theme(axis.ticks = element_blank()) +
     theme(plot.title = element_text(color = color.title, size = 15, vjust = 1.25)) +
     theme(axis.text.x = element_text(size = 8, color = color.axis.text, angle = 90)) + 
